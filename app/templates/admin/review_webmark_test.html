@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}WebMark - Review WebMark Tests{% endblock %}
+
+{% block page_content %}
+  <main class='custom-gradient reviseform full-height-l mt-3'>
+    <div class="container">
+      <div class="row justify-content-md-center wow fadeIn" data-wow-delay="0.2s">
+        <div class="col-md-12">
+              <div class="text-center revise">
+                {% for message in get_flashed_messages() %}
+                <div class="alert mt-5">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    {{ message }}
+                </div>
+                {% endfor %}
+              </div>
+              <div class="product-wrapper">
+                <h3 class="h3-responsive mt-4 font-bold">Review WebMark Tests</h3>
+
+                  <form action="{{ url_for('main.edit_webmark_test') }}" method="post">
+                 <table id="webmarktest" class="table table-striped table-bordered text-center" cellspacing="0">
+                  <thead>
+                    <tr><th>Webmark</th>
+                      <th title="The benchmark source code has been hosted and can be tested with website">Test Automation Status</th>
+                        <th>Test Path</th>
+                        <th>Test Config</th>
+                        <th>Unit of Measurement</th>
+                        <th>Test Duration (Seconds)</th>
+                        <th>Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  {% for w in webmarks %}
+                    <tr>
+                        <td><a href="{{ url_for('main.webmark', id=w.id) }}">{{ w.name }}</a></td>
+                         <td>{% if w.ready %}
+                              <input type="radio" name="r{{w.id}}" value="Yes" checked> Yes
+                              <input type="radio" name="r{{w.id}}" value="No"> No
+                              {% else %}
+                              <input type="radio" name="r{{w.id}}" value="Yes"> Yes
+                              <input type="radio" name="r{{w.id}}" value="No" checked> No
+                              {% endif %}
+                        <td><input type="text" name="p{{w.id}}" value="{{ w.test_path }}"></td>
+                        <td><input type="text" name="c{{w.id}}" value="{{ w.config }}"></td>
+                        <td class="input_short"><input type="text" name="m{{w.id}}" value="{{ w.score_measurement_unit }}"></td>
+                        <td class="input_short"><input type="text" name="d{{w.id}}" value="{{ w.duration }}"></td>
+                        <td>{{ moment(w.timestamp).format("lll") }}</td>
+                    </tr>
+                  {% endfor %}
+                  </tbody>
+                 </table>
+                      <button type="submit" class="btn btn-default">Submit</button>
+                </form>
+
+              </div>
+        </div>
+      </div>
+    </div>
+  </main>
+{% endblock %}

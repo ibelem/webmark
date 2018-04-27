@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
+
+{% block title %}WebMark{% endblock %}
+
+{% block page_content %}
+     <section class="view intro custom-gradient" id='home'>
+      <div class="full-bg-img full-height-l">
+        <div class="container" id='maintitle'>
+          <div class="row flex-center">
+
+              <div class="col-md-12 text-center mt-3">
+                {% for message in get_flashed_messages() %}
+                <div class="alert mt-5">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    {{ message }}
+                </div>
+                {% endfor %}
+              </div>
+
+            <div class="col-md-10 col-lg-6 text-center text-md-left margins">
+              <div class="white-text">
+                <h1 class="display-4 mb-2 white-text font-weight-bold wow fadeInLeft" data-wow-delay="0.3s">WebMark</h1>
+                <hr class="hr-light wow fadeInLeft" data-wow-delay="0.3s">
+                <h6 class="wow fadeInLeft" data-wow-delay="0.3s">Complete Performance Testing Suite for Browsers and Web Runtimes.
+                </h6>
+                <br>
+                <!--<a class="btn btn-white btn-lg wow fadeInDown" data-wow-delay="0.3s">Run test</a>-->
+                <a class="btn btn-outline-white btn-lg wow fadeInDown" data-wow-delay="0.3s" href="{{ url_for('main.webmarks') }}">Learn more</a>
+              </div>
+            </div>
+
+            <div id='mainwebgl' class="col-md-6 col-lg-6 clearfix d-md-flex d-none wow fadeInRight justify-content-center" data-wow-delay="0.3s">
+              <div class='loader'></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/three.r89.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/index.bundle.js') }}"></script>
+<script src="{{ url_for('static', filename='js/classie.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,24 @@
+#filter label {
+  margin-bottom: 0px;
+  font-weight: normal;
+  margin: 0px 10px 0px 0px;
+  cursor: pointer;
+}
+
+#filter label {
+  display: inline-block;
+  max-width: 100%;
+  margin-bottom: 5px;
+}
+
+#filter label.selected {
+  padding: 0px 4px;
+  color: rgb(255, 255, 255);
+  background-color: rgb(38, 185, 154);
+  border-radius: 3px;
+  border: 1px solid rgb(22, 159, 133);
+}
+
+#filter input[type=checkbox] {
+  display: none;
+}

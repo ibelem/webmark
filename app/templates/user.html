@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+
+{% block title %}WebMark - {{ user.username }}{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+{% endblock %}
+
+{% block page_content %}
+
+{% if current_user.username == user.username %}
+
+  <main class='custom-gradient full-height-l mt-3'>
+    <div class="container">
+        <div class="row wow fadeIn" data-wow-delay="0.2s">
+            <div class="col-md-12">
+              <div class="text-center revise">
+                {% for message in get_flashed_messages() %}
+                <div class="alert mt-5">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    {{ message }}
+                </div>
+                {% endfor %}
+              </div>
+              <div class="product-wrapper">
+                <h3 class="h3-responsive mt-4 font-bold">{{ user.username }}</h3>
+                <hr>
+                <dl class="row mt-4">
+                  <dt class="col-sm-3">Name</dt>
+                  <dd class="col-sm-9">{% if user.name %}{{ user.name }}{% endif %}</dd>
+                  <dt class="col-sm-3">Location</dt>
+                  <dd class="col-sm-9">{% if user.location %}
+                from <a href="http://maps.google.com/?q={{ user.location }}">{{ user.location }}</a><br>
+            {% endif %}</dd>
+                  <dt class="col-sm-3">About me</dt>
+                  <dd class="col-sm-9">{% if user.about_me %}{{ user.about_me }}{% endif %}</dd>
+                  <dt class="col-sm-3 text-truncate">Member since</dt>
+                  <dd class="col-sm-9">{{ moment(user.member_since).format("lll") }}</dd>
+                  <dt class="col-sm-3 text-truncate">Last seen</dt>
+                  <dd class="col-sm-9">{{ moment(user.last_seen).format("lll") }}</dd>
+                  <dt class="col-sm-3 text-truncate">Comments</dt>
+                  <dd class="col-sm-9">{{ user.comments.count() }}</dd>
+                </dl>
+
+                <hr>
+
+            {% if user == current_user %}
+            <a class="btn btn-gradient btn-md" href="{{ url_for('.edit_profile') }}">Edit Profile</a>
+            {% endif %}
+            {% if current_user.is_administrator() %}
+            <a class="btn btn-danger btn-md" href="{{ url_for('.edit_profile_admin', id=user.id) }}">Edit Profile [Admin]</a>
+            {% endif %}
+                <a class="btn btn-outline-secondary btn-md ml-0" href='{{ url_for('auth.change_email_request') }}'>Change Email</a>
+              </div>
+            </div>
+        </div>
+        <div class="col-lg-12 wow fadeIn"  data-wow-delay="0.2s">
+          <div class="row mt-5">
+            <div class="col-12 reviews ">
+              <h3 class="h3-responsive font-bold">Reviews by {{ user.username }}</h3>
+            </div>
+              {% if results %}
+              {% for c, w, u in results %}
+                <div class="col-12 {{ loop.cycle('odd', 'even') }} ">
+                  <div class="media-body">
+                    <div id="rating-id-{{loop.index0}}" class="mb-2">
+                      <i class="star star-under fa fa-star">
+                                  <i class="star star-over fa fa-star"></i>
+                      </i>
+                      <i class="star star-under fa fa-star">
+                                  <i class="star star-over fa fa-star"></i>
+                      </i>
+                      <i class="star star-under fa fa-star">
+                                  <i class="star star-over fa fa-star"></i>
+                      </i>
+                      <i class="star star-under fa fa-star">
+                                  <i class="star star-over fa fa-star"></i>
+                      </i>
+                      <i class="star star-under fa fa-star">
+                                  <i class="star star-over fa fa-star"></i>
+                      </i>
+                    </div>
+                    <p class="mb-2 linebreak text-left">{{ c.body }}</p>
+                    {% if current_user.is_administrator() %}
+                    <form class="delete-comment" action="{{ url_for('main.webmark_comment_delete') }}" method="post">
+                      <input type="radio" name="comment_id" value="{{c.id}}" checked style="display:none">
+                      <h6 class="mt-2 pix13">{{ moment(c.timestamp).format("lll") }} by {{ u.username }}, commented in <a href="{{ url_for('main.webmark', id=w.id) }}" title="{{ w.name }}">{{ w.name }}</a> <button type="submit" class="fa fa-trash float-right"></button></h6>
+                    </form>
+                    {% else %}
+                      <h6 class="mt-2 pix13">{{ moment(c.timestamp).format("lll") }} by {{ u.username }}, commented in <a href="{{ url_for('main.webmark', id=w.id) }}" title="{{ w.name }}">{{ w.name }}</a></h6>
+                    {% endif %}
+
+                  </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="mt-3 col-12">No comment</div>
+                {% endif %}
+
+            </div>
+          </div>
+        </div>
+    </div>
+  </main>
+
+{% else %}
+<section class="view intro custom-gradient full-height-l">
+  <div class="full-bg-img">
+    <div class="container flex-center">
+      <div class="d-flex align-items-center content-height">
+        <div class="row flex-center ">
+          <div class="col-md-12 text-center text-md-left">
+            <div class="white-text">
+              <h2 class="h2-responsive font-weight-bold wow fadeInTop" data-wow-delay="0.3s">Hello, {{ current_user.username }}!</h2>
+    <p>
+      You are about to access <span class="font-weight-bold">{{ user.username }}</span>'s profile which is not authorized, please visit <a href="{{ url_for('main.user', username=current_user.username) }}">my profile</a>.
+    </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+  <script>
+    function rateStyleJQ(num, divID) {
+      var ratingRounded = Math.floor(num);
+      $("#" + divID + " .star-over").slice(0, ratingRounded).addClass('star-visible');
+      var partialShade = Math.round((num - ratingRounded) * 100);
+      if (partialShade != 0) {
+        $($("#" + divID + " .star-over").get(ratingRounded)).addClass('star-visible').css("width", partialShade + "%");
+      }
+    }
+
+    $(document).ready(function() {
+        const rating = [{% for c, w, u in results %}{% for r in ratings %}{% if r.webmark_id == c.webmark_id %}{{r.star}},{% else %}{% endif %}{% endfor %}{% endfor %}]
+        for (let i in rating) {
+          rateStyleJQ(rating[i], 'rating-id-' + i)
+        }
+    });
+  </script>
+{% endblock %}
+

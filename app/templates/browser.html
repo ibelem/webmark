@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block title %}WebMark - Browser{% endblock %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+{% endblock %}
+
+{% block page_content %}
+<main class='full-height-l'>
+  <div class="container" id="browser">
+    <div class="pt-3 mt-3">
+      <div class="col-12 reviews-noline mt-1">
+        <h3 class="h3-responsive font-bold">WebMark on Mainstream Desktops</h3>
+        <div class="text-right text-uppercase text-small">Last Update: {{ update.timestamp }}</div>
+      </div>
+        <form id="query" action="{{ url_for('main.view_browser') }}" method="post">
+      <div class="filter mb-3">
+        <table id="filter" class="t-filter table table-condensed">
+          <tbody>
+            <tr>
+              <th class='text-center'>OS</th>
+              <td>
+                {% for o in os %}
+                <input type="radio" name="o" class="d-none" id="os-{{ o.os }}-{{ o.os_version }}" value="{{ o.os }} {{ o.os_version }}" {% if querylist %}{% if querylist['o'] == o.os|string()+' '+ o.os_version|string() %}checked{% endif %}{% endif %}>
+                <label id="los-{{ o.os }}-{{ o.os_version }}" for="os-{{ o.os }}-{{ o.os_version }}" {% if querylist %}{% if querylist['o'] == o.os|string()+' '+ o.os_version|string() %}class='cked'{% endif %}{% endif %}>{{ o.os }} {{ o.os_version }}</label>
+                {% endfor %}
+              </td>
+            </tr>
+            <tr>
+              <th class='text-center'>Browser</th>
+              <td>
+                {% for b in browsers %}
+                <input type="radio" class="d-none" name="b" id="browser-{{ b.browser_name }}" value="{{ b.browser_name }}" {% if querylist %}{% if querylist['b'] == b.browser_name %}checked{% endif %}{% endif %}>
+                <label id="lbrowser-{{ b.browser_name }}" for="browser-{{ b.browser_name }}" {% if querylist %}{% if querylist['b'] == b.browser_name %}class='cked'{% endif %}{% endif %}>{{ b.browser_name }}</label>
+                {% endfor %}
+              </td>
+            </tr>
+            <tr>
+              <th class='text-center'>WebMark</th>
+              <td>
+                  {% for w in webmarks %}
+                <input type="radio" class="d-none" name="wm" id="wm-{{ w.name }}" value="{{ w.name }}" {% if querylist %}{% if querylist['wm'] == w.name %}checked{% endif %}{% endif %}>
+                <label id="lwm-{{ w.name }}" for="wm-{{ w.name }}" {% if querylist %}{% if querylist['wm'] == w.name %}class='cked'{% endif %}{% endif %}>{{ w.name }}</label>
+                  {% endfor %}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+        </form>
+    </div>
+    {% if scores %}
+    <div class="mt-2">
+      <div class="">
+        <div class="view overlay pt-4 pl-3 pr-3">
+          <div class="webmarkrank" id='{% for s, w in scores %}{% if loop.first %}{{ w.id }}{% endif %}{% endfor %}-rank'></div>
+        </div>
+        <!--<div class="">-->
+          <!--&lt;!&ndash;<i class='d-inline fa fa-angle-double-right d-inline expand-switcher pt-1 pb-1 pl-2 pr-2'></i>&ndash;&gt;-->
+          <!--<p class="d-inline text-uppercase text-small float-right"></p>-->
+        <!--</div>-->
+      </div>
+    </div>
+    {% else %}
+    <div class="mt-2">
+        <div class="row container">
+        <div class="col col-12">
+           No webmark results
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="container">
+    <div >
+      <div class="col-12 reviews-noline mt-3">
+        <h3 class="h3-responsive font-bold">Checking My Computer?</h3>
+      </div>
+    </div>
+    <div class="filter mb-5">
+      <table id="filter2" class="t-filter table table-condensed">
+        <tbody>
+          <tr>
+            <th class='text-center'>Webmarks</th>
+            <td>
+              {% for w in webmarks %}
+              <input type="radio" class="d-none" name="cwm" id="cwm-{{ w.id }}" value="{{ w.name }}" {% if loop.first %}checked{% endif %}>
+              <label id="clwm-{{ w.id }}" for="cwm-{{ w.id }}" {% if loop.first %}class="cked"{% endif %}>{{ w.name }}</label>
+                {% endfor %}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="text-center">
+        <button id='runtestnow' type='button' class="btn btn-gradient btn-md ml-0 mt-3">Run Test</button>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{% if scores %}
+<script src='{{ url_for('static', filename='js/vendor/echarts/echarts.min.js') }}'></script>
+{% endif %}
+<script>
+    $(document).ready(function() {
+        $('#query input[type="radio"]').change(function () {
+            $('#query').submit();
+        });
+    });
+
+    {% if scores %}
+    let chart_{% for s, w in scores %}{% if loop.first %}{{ w.id }}{% endif %}{% endfor %} = function() {
+      const dom = document.getElementById("{% for s, w in scores %}{% if loop.first %}{{ w.id }}{% endif %}{% endfor %}-rank");
+      let myChart = echarts.init(dom, 'westeros');
+      let option = {
+        aria: {
+          show: true
+        },
+        title: {
+          left: 'center',
+          text: '{{ querylist['wm'] }} ({% for s, w in scores %}{% if loop.first %}{{ w.score_measurement_unit }}{% endif %}{% endfor %})',
+          subtext: '{% for s, w in scores %}{% if loop.first %}{{ w.config }}{% endif %}{% endfor %} / {% for s, w in scores %}{% if loop.first %}{{ w.metrics }}{% endif %}{% endfor %}',
+        },
+        tooltip: {
+          trigger: 'axis'
+        },
+        legend: {
+          orient: 'horizontal',
+          left: 'center',
+          bottom: 10,
+          data: ['{{ querylist['b'] }}'],
+          textStyle: {
+            color: '#505a63',
+            fontSize: 12
+          }
+        },
+        toolbox: {
+          feature: {
+            saveAsImage: {}
+          }
+        },
+        grid: {
+          containLabel: true,
+          left: '2%',
+          right: '2%',
+        },
+        xAxis: {
+          type: 'value',
+          boundaryGap: true,
+          axisLabel: {
+            show: true,
+            inside: false,
+            rotate: 0,
+            showMinLabel: null,
+            showMaxLabel: null,
+            margin: 2,
+            color: '#505a63',
+            fontSize: 12
+          },
+        },
+        yAxis: {
+          type: 'category',
+          data: [
+           {% for s, w in scores %}
+              '{% if uid|int() == s.author_id|int() %}MY{% else %}{% endif %} {% if s.cpu_name == '' %}CPU Unknown{% else %}{{ s.cpu_name | replace("AMD","") }}{% endif %}/{{ s.gpu_name | replace("vs_5_0 ps_5_0", "") |replace("(NVIDIA GeForce","") | replace("(Intel(R) ","") | replace(")","") | replace("Intel(R", "") | replace("(Skylake GT2","") | replace("ANGLE","") | replace("Direct3D11","") | replace("Microsoft","") | replace("Google","") |replace("Mesa DRI","") | replace("Graphics","") | replace(" ","")}}\n{{ s.screen_width }}x{{ s.screen_height }} {{ s.browser_name }} {{ s.browser_version }}',
+           {% endfor %}
+          ],
+          boundaryGap: true,
+          axisLabel: {
+            show: true,
+            inside: false,
+            rotate: 0,
+            showMinLabel: null,
+            showMaxLabel: null,
+            margin: 10,
+            fontSize: 12,
+            color: function(value, index) {
+				return value.indexOf('MY') > -1 ? 'rgba(30, 150, 255, 1.0)' : '#505a63';
+		    }
+            <!--formatter:function(val){-->
+                    <!--var strs = val.split('');-->
+                    <!--var str = ''-->
+                    <!--for (var i = 0, s; s = strs[i++];) {-->
+                        <!--str += s;-->
+                        <!--if (!(i % 4)) str += '\n';-->
+                    <!--}-->
+                    <!--return str-->
+            <!--}-->
+          }
+        },
+        series: [{
+          type: 'bar',
+          data: [
+          {% for s, w in scores %}
+            {{ s.score }},
+          {% endfor %}],
+          name: '{{ querylist['b'] }}'
+        }],
+      };
+
+      myChart.setOption(option);
+      if (option && typeof option === "object") {
+        myChart.setOption(option, true);
+        let updateChartSize = function() {
+          myChart.resize();
+        }
+        document.addEventListener('resize', updateChartSize, false);
+        $('.card').resize(function() {
+          updateChartSize();
+        });
+      }
+    }
+
+    let initchart = function() {
+      chart_{% for s, w in scores %}{% if loop.first %}{{ w.id }}{% endif %}{% endfor %}();
+    }
+
+    $(document).ready(function() {
+      var h = 130 + {{scores | length }}*56;
+      $('.webmarkrank').height('' + h + 'px');
+
+      initchart();
+      <!--$('.expand-switcher').click(function() {-->
+        <!--$('.card-deck').toggleClass('card-deck-cn');-->
+        <!--$('.expand-switcher').toggleClass('fa-angle-double-right');-->
+        <!--$('.expand-switcher').toggleClass('fa-angle-double-left');-->
+        <!--$('.webmarkrank').toggleClass('webmarkrank-toggle');-->
+      <!--});-->
+
+      $('input:radio[name=cwm]').click(function(){
+        var rid = $("input:radio[name='cwm']:checked").attr('id');
+        var lid = 'clwm' + rid.replace('cwm','');
+        $('#filter2 label').removeClass('cked');
+        $('#'+lid).toggleClass('cked');
+      });
+
+      $('#runtestnow').click(function(){
+        var rid = $("input:radio[name='cwm']:checked").attr('id');
+        rid = rid.replace('cwm-','');
+        location.href= '../run-webmark/' + rid;
+      });
+    });
+    {% endif %}
+
+</script>
+{% if scores %}
+<script src='{{ url_for('static', filename='js/vendor/echarts/theme.js') }}'></script>
+{% endif %}
+
+{% endblock %}
+
+

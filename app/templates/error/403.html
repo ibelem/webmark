@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}WebMark - Forbidden{% endblock %}
+
+{% block page_content %}
+  <main class='custom-gradient full-height-l'>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 mt-5">
+            <h3>HTTP 403 Forbidden</h3>
+            <div class="na">
+            <i class="fa fa-user-secret"></i> <i class="fa fa-id-badge"></i>
+            </div>
+
+            <div class="mt-3 mb-3">Oops, you are not authorized to access this page, have you logged in? </div>
+            <a class="btn btn-gradient btn-md wow" data-wow-delay="0.3s" href="{{ url_for('main.index') }}">Go back home</a>
+        </div>
+       </div>
+    </div>
+  </main>
+{% endblock %}

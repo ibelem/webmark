@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}WebMark - Send Feedbacks{% endblock %}
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+{% block page_content %}
+  <main class="full-height-l mt-5 reviseform">
+    <div class='container'>
+      <div class='row mt-0'>
+        <div class="col-md-12 text-center revise">
+            <h3 class="h3-responsive mt-1 font-bold">Feedback</h3>
+            <hr>
+            <div class="text-left mb-5">We strive to bring the best user experience to you through the Webmark service.
+                We welcome your feedback on our website.</div>
+            <div class="text-left mt-3">
+                {{ wtf.quick_form(form) }}
+            </div>
+        </div>
+      </div>
+    </div>
+  </main>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+
+</script>
+{% endblock %}
+

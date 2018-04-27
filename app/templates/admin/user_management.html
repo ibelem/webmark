@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}WebMark - User Management{% endblock %}
+
+{% block page_content %}
+  <main class='custom-gradient reviseform full-height-l mt-3'>
+    <div class="container">
+      <div class="row justify-content-md-center wow fadeIn" data-wow-delay="0.2s">
+        <div class="col-md-12">
+              <div class="product-wrapper">
+                <h3 class="h3-responsive mt-4 font-bold">User Management</h3>
+                  <form action="{{ url_for('main.user_edit') }}" method="post">
+                 <table id="webmarkproposal" class="table table-striped table-bordered text-center" cellspacing="0">
+                  <thead>
+                    <tr>
+                      <th><i class="fa fa-chrome pros-text"></i> ID</th>
+                      <th><i class="fa fa-edge pros-text"></i> User Name</th>
+                      <th><i class="fa fa-safari pros-text"></i> Email</th>
+                        <th><i class="fa fa-safari pros-text"></i> Email Confirmed</th>
+                      <th><i class="fa fa-opera pros-text"></i> Role</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  {% for i in user %}
+                    <tr>
+                        <td >{{loop.index}}</td>
+                          <td class="">{{i.username }}</td>
+                        <td>{{i.email }}</td>
+                          <td>{% if i.confirmed %}
+                              <input type="radio" name="c{{i.id}}" value="True" checked> True
+                              <input type="radio" name="c{{i.id}}" value="False"> False
+                              {% else %}
+                              <input type="radio" name="c{{i.id}}" value="True"> True
+                              <input type="radio" name="c{{i.id}}" value="False" checked> <span class="btn-danger">False</span>
+                              {% endif %}
+                               </td>
+                          <td>
+                              {% if i.role_id == 3 %}
+                              <input type="radio" name="r{{i.id}}" value="1"> User
+                              <input type="radio" name="r{{i.id}}" value="3" checked> <span class="btn-danger">Administrator</span>
+                              {% else %}
+                              <input type="radio" name="r{{i.id}}" value="1" checked> User
+                              <input type="radio" name="r{{i.id}}" value="3"> Administrator
+                              {% endif %}
+                          </td>
+                    </tr>
+                  {% endfor %}
+                  </tbody>
+                 </table>
+                <button type="submit" class="btn btn-default">Submit</button>
+                </form>
+              </div>
+        </div>
+      </div>
+    </div>
+  </main>
+{% endblock %}

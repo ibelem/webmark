@@ -1,0 +1,7 @@
+<p>Dear {{ u.username }},</p>
+<p>Our user {{ user.username }} added update for <a href="{{ url_for('main.webmark', id=webmark.id, _external=True) }}">{{ webmark.name }}</a>.</p>
+<p>You can visit <a href="{{ url_for('main.webmark', id=webmark.id, _external=True) }}">{{ url_for('main.webmark', id=webmark.id, _external=True) }}</a> for more details.</p>
+<p>Sincerely,</p>
+<p>The WebMark Team</p>
+<p><small>This message was sent to {{ u.email }}. Please <a href="{{ url_for('main.webmarks', _external=True) }}">unsubscribe</a> if you don't want to receive these emails in the future.</small></p>
+

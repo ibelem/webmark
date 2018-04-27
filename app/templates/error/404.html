@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}WebMark - Page Not Found{% endblock %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+{% endblock %}
+
+{% block page_content %}
+  <i id='ambulance' class="fa fa-ambulance"></i>
+  <main class='custom-gradient full-height-l'>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 mt-5">
+            <h3>HTTP 404 Not Found</h3>
+            <div class="na">
+            <i class="fa fa-chrome"></i> <i class="fa fa-firefox"></i>
+            <i class="fa fa-edge "></i> <i class="fa fa-safari"></i>
+            <i class="fa fa-opera"></i>
+            </div>
+
+            <div class="mt-3 mb-3">Oops, we found nothing... </div>
+            <a class="btn btn-gradient btn-md wow" data-wow-delay="0.3s" href="{{ url_for('main.index') }}">Go back home</a>
+        </div>
+       </div>
+    </div>
+  </main>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    var start = null;
+    var element = document.getElementById('ambulance');
+    element.style.position = 'absolute';
+    element.style.top = '86px';
+
+    var t = 0;
+    function step(timestamp) {
+      if (!start) start = timestamp;
+      var progress = timestamp - start;
+      element.style.right = Math.min(progress / 10, 1920) + 'px';
+      let stepwidth = 10;
+      t += stepwidth;
+      if(t > 255) t = 0;
+      element.style.color = "rgb(" + t + ", 0, 0)";
+      if (progress < 19200) {
+        window.requestAnimationFrame(step);
+      }
+    }
+    window.requestAnimationFrame(step);
+</script>
+{% endblock %}
+

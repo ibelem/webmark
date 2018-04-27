@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}WebMark - Change Email Address{% endblock %}
+
+{% block page_content %}
+    <section class="view intro custom-gradient full-height">
+      <div class="full-bg-img pt-4">
+        <div class="container col-md-3 mt-5 pt-5">
+                <div class="card wow fadeInRight mt-5" data-wow-delay="0.3s">
+                  <div class="card-body">
+                    <div class="text-center">
+                      <h3 class="white-text">
+                        Change Your Email</h3>
+                      <hr class="hr-light">
+                    </div>
+
+                      {{ wtf.quick_form(form) }}
+
+                  <div class="text-center mt-4">
+                  <div class="text-center">
+                        {% for message in get_flashed_messages() %}
+                        <div class="alert">
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                  </div>
+                  <hr class="hr-light mb-3 mt-4">
+
+                      <div class="text-center d-flex justify-content-center">
+                        <a class='bright-link' href="{{ url_for('auth.logout') }}">
+                          Logout
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+        </div>
+      </div>
+    </section>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}WebMark - Edit WebMark{% endblock %}
+
+{% block page_content %}
+
+  <main class='custom-gradient reviseform full-height-l'>
+    <div class="container">
+      <div class="row justify-content-md-center wow fadeIn" data-wow-delay="0.1s">
+        <div class="col-md-12">
+              <div class="text-center revise">
+                {% for message in get_flashed_messages() %}
+                <div class="alert mt-5">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    {{ message }}
+                </div>
+                {% endfor %}
+              </div>
+              <div class="product-wrapper">
+                <h3 class="h3-responsive mt-5 font-bold">Edit WebMark</h3>
+                <hr>
+                    {{ wtf.quick_form(form) }}
+              </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+{% endblock %}

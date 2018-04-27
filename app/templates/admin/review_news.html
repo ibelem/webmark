@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}WebMark - Edit WebMark News{% endblock %}
+
+{% block page_content %}
+  <main class='custom-gradient reviseform full-height-l mt-3'>
+    <div class="container">
+      <div class="row justify-content-md-center wow fadeIn" data-wow-delay="0.2s">
+        <div class="col-md-12">
+              <div class="text-center revise">
+                {% for message in get_flashed_messages() %}
+                <div class="alert mt-5">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    {{ message }}
+                </div>
+                {% endfor %}
+              </div>
+              <div class="product-wrapper">
+                <h3 class="h3-responsive mt-4 font-bold">Edit WebMark News</h3>
+                  {% if results %}
+                  <form action="{{ url_for('main.delete_webmark_news') }}" method="post">
+                 <table id="webmarkproposal" class="table table-striped table-bordered text-center" cellspacing="0">
+                  <thead>
+                    <tr><th>For Webmark</th>
+                      <th>Summary</th>
+                      <th>By</th>
+                        <th>Date</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  {% for w, n, u in results %}
+                    <tr>
+                        <td><a href="{{ url_for('main.webmark', id=w.id) }}">{{ w.name }} </a></td>
+                        <td class="text-left" >{{ n.summary }} </a></td>
+                        <td>{{ u.username }}</td>
+                          <td>{{ moment(n.timestamp).format("lll") }}</td>
+                        <td><a href="{{ url_for('main.edit_webmark_news', id=n.id) }}">Edit</a></td>
+                          <td>
+                              <input type="checkbox" name="d{{n.id}}" value="Yes">
+                          </td>
+                    </tr>
+                  {% endfor %}
+                  </tbody>
+                 </table>
+                <button type="submit" class="btn btn-default">Submit</button>
+                </form>
+                  {% else %}
+                    No news or updates.
+                  {% endif %}
+              </div>
+        </div>
+      </div>
+    </div>
+  </main>
+{% endblock %}

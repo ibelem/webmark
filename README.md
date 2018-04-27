@@ -1,1 +1,4 @@
-# webmark
+WebMark
+======
+
+Website for web benchmarks.

@@ -1,0 +1,11 @@
+Dear {{ u.username }},
+
+Our user {{ user.username }} added new comment or update for {{ webmark.name }}.
+
+You can visit {{ url_for('main.webmark', id=webmark.id, _external=True) }} for more details.
+
+Sincerely,
+
+The WebMark Team
+
+This message was sent to {{ u.email }}. If you don't want to receive these emails in the future, Please unsubscribe at {{ url_for('main.webmarks') }}.

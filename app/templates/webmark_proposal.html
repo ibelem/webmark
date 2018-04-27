@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}WebMark - Proposal{% endblock %}
+
+{% block page_content %}
+
+
+  <main class='custom-gradient reviseform full-height'>
+    <div class="container">
+      <div class="row justify-content-md-center wow fadeIn" data-wow-delay="0.4s">
+        <div class="col-md-6">
+              <div class="product-wrapper">
+                <h3 class="h3-responsive mt-4 font-bold">Propose New Benchmarks for Web</h3>
+                <hr>
+                    {{ wtf.quick_form(form) }}
+              </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+
+{% endblock %}

@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+
+{% block title %}WebMark - Browser{% endblock %}
+{% block head %}
+{{ super() }}
+{% if scores %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dataTables.bootstrap4.min.css') }}">
+{% endif %}
+{% endblock %}
+
+{% block page_content %}
+<main class='full-height-l'>
+  <div class="container" id="browser">
+    <div class="pt-3 mt-5">
+        <form id="query" action="{{ url_for('main.view_trend') }}" method="get">
+      <div class="filter mb-3">
+        <table id="filter" class="t-filter table table-condensed">
+          <tbody>
+          <tr>
+            <th class='text-center'>CPU</th>
+            <td>
+              {% for c in cpus %}
+                {% if c.cpu_name.lower().find('8700k') > -1 or c.cpu_name.lower().find('1800x') > -1 %}
+                <input type="radio" class="d-none" name="cpu" id="cpu-{{ c.cpu_name | replace('AMD','') | replace(' R', 'R') | replace(' ', '-')  }}" value="{{ c.cpu_name | replace('AMD','') | replace(' R', 'R') }}" {% if querylist %}{% if c.cpu_name.find(querylist['c']) >-1 %}checked{% endif %}{% endif %}>
+                <label id="lcpu-{{ c.cpu_name | replace('AMD','') | replace(' R', 'R') | replace(' ', '-')}}" for="cpu-{{ c.cpu_name | replace('AMD', '') | replace(' R', 'R') | replace(' ', '-') }}" {% if querylist %}{% if c.cpu_name.find(querylist['c']) >-1 %}class="cked"{% endif %}{% endif %}>{{ c.cpu_name | replace('AMD','') | replace(' R', 'R')}}</label>
+                {% endif %}
+              {% endfor %}
+            </td>
+          </tr>
+                    <tr>
+            <th class='text-center'>GPU</th>
+            <td>
+                <input type="radio" class="d-none" name="gpu" id="gpu-630" value="HD 630" {% if querylist %}{% if querylist['g'].find('630') >-1 %}checked{% elif querylist['g'].find('630') < 0 and querylist['g'].find('1080') < 0 %}checked{% endif %}{% endif %}>
+                <label id="lgpu-gtx630" for="gpu-630" {% if querylist %}{% if querylist['g'].find('630') >-1 %}class='cked'{% elif querylist['g'].find('630') < 0 and querylist['g'].find('1080') < 0 %}class='cked'{% endif %}{% endif %}>HD 630</label>
+                <input type="radio" class="d-none" name="gpu" id="gpu-1080" value="GTX 1080" {% if querylist %}{% if querylist['g'].find('1080') >-1 %}checked{% endif %}{% endif %}>
+                <label id="lgpu-gtx1080" for="gpu-1080" {% if querylist %}{% if querylist['g'].find('1080') >-1 %}class='cked'{% endif %}{% endif %}>GTX 1080</label>
+            </td>
+          </tr>
+            <tr>
+              <th class='text-center'>OS</th>
+              <td>
+                {% for o in os %}
+                {% if o.os_version == '10' and o.os=='Windows' %}
+                <input type="radio" name="o" class="d-none" id="os-{{ o.os }}-{{ o.os_version }}" value="{{ o.os }} {{ o.os_version }}" {% if querylist %}{% if querylist['o'] == o.os|string()+' '+ o.os_version|string() %}checked{% endif %}{% endif %}>
+                <label id="los-{{ o.os }}-{{ o.os_version }}" for="os-{{ o.os }}-{{ o.os_version }}" {% if querylist %}{% if querylist['o'] == o.os|string()+' '+ o.os_version|string() %}class='cked'{% endif %}{% endif %}>{{ o.os }} {{ o.os_version }}</label>
+                {% endif %}
+                {% endfor %}
+              </td>
+            </tr>
+            <tr>
+              <th class='text-center'>WebMark</th>
+              <td>
+                  {% for w in webmarks %}
+                {% if w.name == 'WebGL Aquarium' or w.name == 'JetStream' %}
+                <input type="radio" class="d-none" name="wm" id="wm-{{ w.name }}" value="{{ w.name }}" {% if querylist %}{% if querylist['wm'] == w.name %}checked{% endif %}{% endif %}>
+                <label id="lwm-{{ w.name }}" for="wm-{{ w.name }}" {% if querylist %}{% if querylist['wm'] == w.name %}class='cked'{% endif %}{% endif %}>{{ w.name }}</label>
+                {% endif %}
+                {% endfor %}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+        </form>
+    </div>
+  </div>
+  <section class='mt-3'>
+    <div class="container">
+      <div class="row mt-5">
+        <div class="col-3 wow fadeIn" data-wow-delay="0.1s">
+          <div class="widget-wrapper">
+            <div class="list-group">
+              <span class="list-group-item">Test results are compiled from user's report. </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-9">
+          {% if scores %}
+          <h4 class="h4-responsive font-bold text-center mb-4">{% for s, w in scores %}{% if loop.first %}{{ s.cpu_name }} - {{ s.gpu_name | replace("vs_5_0 ps_5_0", "") |replace("(NVIDIA GeForce","") | replace("(Intel(R) ","") | replace(")","") | replace("Intel(R", "") | replace("(Skylake GT2","") | replace("ANGLE","") | replace("Direct3D11","") | replace("Microsoft","") | replace("Google","") |replace("Mesa DRI","") | replace("Graphics","") }} - {{ s.os }} {{ s.os_version }} - {{ w.name }}{% endif %}{% endfor %}
+            </h4>
+          <div class="wow fadeIn" data-wow-delay="0.1s">
+            <h4 class="h4-responsive font-bold mt-4">Timeline</h4>
+            <div id='chartcontainer' class='mt-3 col-12'></div>
+          </div>
+          <div class="wow fadeIn" data-wow-delay="0.2s">
+            <h4 class="h4-responsive font-bold mt-4 d-inline">Overview</h4> <span class="float-right card-text text-center text-uppercase">{% for s, w in scores %}{% if loop.first %}{% endif %}{% endfor %}</span>
+
+            <table id="datatables" class="table table-striped table-bordered text-center mt-3" cellspacing="0">
+              <thead>
+                <tr>
+                  <th><i class="fa fa-chrome pros-text"></i> Chrome</th>
+                  <th><i class="fa fa-firefox pros-text"></i> Firefox</th>
+                  <th><i class="fa fa-edge pros-text"></i> Edge</th>
+                </tr>
+              </thead>
+              <tbody>
+              <tr>
+                  <td>
+                    {% for s, w in scores %}
+                      {% if s.browser_name == 'Chrome' %}
+                      <div title="{{s.browser_name}} {{s.browser_version}} / {{s.screen_width}}x{{s.screen_height}}">
+                      <div class="ribbon ribbon--purple">{{s.browser_major}}</div> {{s.score}}
+                      </div>
+                      {% endif %}
+                    {% endfor %}
+                  </td>
+                  <td>
+                    {% for s, w in scores %}
+                      {% if s.browser_name == 'Firefox' %}
+                      <div title="{{s.browser_name}} {{s.browser_version}} / {{s.screen_width}}x{{s.screen_height}}">
+                        <div class="ribbon ribbon--purple">{{s.browser_major}}</div> {{s.score}}
+                      </div>
+                      {% endif %}
+                    {% endfor %}
+                  </td>
+                  <td>
+                    {% for s, w in scores %}
+                      {% if s.browser_name == 'Edge' %}
+                      <div title="{{s.browser_name}} {{s.browser_version}} / {{s.screen_width}}x{{s.screen_height}}">
+                        <div class="ribbon ribbon--purple">{{s.browser_major}}</div> {{s.score}}
+                      </div>
+                      {% endif %}
+                    {% endfor %}
+                  </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          No results
+        {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{% if scores %}
+  <!--<script src='{{ url_for('static', filename='js/vendor/materialize/0.97.5/materialize.min.js') }}'></script>-->
+  <!--<script src='{{ url_for('static', filename='js/vendor/datatables/js/jquery.dataTables.min.js') }}'></script>-->
+  <!--<script src='{{ url_for('static', filename='js/vendor/datatables/js/dataTables.bootstrap4.min.js') }}'></script>-->
+  <!--<script>-->
+    <!--$(document).ready(function() {-->
+      <!--$('#datatables').DataTable();-->
+    <!--});-->
+
+    <!--$(document).ready(function() {-->
+      <!--$('select[name="datatables_length"]').material_select();-->
+    <!--});-->
+  <!--</script>-->
+
+<script src='{{ url_for('static', filename='js/vendor/echarts/echarts.min.js') }}'></script>
+  <script>
+    var chart = function() {
+      var dom = document.getElementById("chartcontainer");
+      var myChart = echarts.init(dom, 'westeros');
+      option = {
+        aria: {
+          show: true
+        },
+        title: {
+          left: 'center',
+          text: '{% for s, w in scores %}{% if loop.first %}{{ w.name }} Trends / {{ w.score_measurement_unit }}{% endif %}{% endfor %}',
+          subtext: '{% for s, w in scores %}{% if loop.first %}{{ s.cpu_name }} / {{ s.gpu_name | replace("vs_5_0 ps_5_0", "") |replace("(NVIDIA GeForce","") | replace("(Intel(R) ","") | replace(")","") | replace("Intel(R", "") | replace("(Skylake GT2","") | replace("ANGLE","") | replace("Direct3D11","") | replace("Microsoft","") | replace("Google","") |replace("Mesa DRI","") | replace("Graphics","") | replace(" ","") }} / {{ s.os }} {{ s.os_version }} / {{ w.config }} / {{ w.metrics}}{% endif %}{% endfor %}',
+        },
+        tooltip: {
+          trigger: 'axis'
+        },
+        legend: {
+          left: 'center',
+          bottom: 10,
+          data: ['Chrome', 'Firefox', 'Edge'],
+          textStyle: {
+            color: '#505a63',
+            fontSize: 10
+          }
+        },
+        toolbox: {
+          feature: {
+            dataZoom: {
+              yAxisIndex: 'none'
+            },
+            restore: {},
+            saveAsImage: {}
+          }
+        },
+        xAxis: {
+          type: 'category',
+          data: {{chartArray}},
+          axisLabel: {
+            show: true,
+            inside: false,
+            rotate: 0,
+            showMinLabel: null,
+            showMaxLabel: null,
+            margin: 10,
+            color: '#505a63',
+            fontSize: 10
+          }
+        },
+        yAxis: {
+          type: 'value',
+          boundaryGap: true,
+          axisLabel: {
+            show: true,
+            inside: false,
+            rotate: 0,
+            showMinLabel: null,
+            showMaxLabel: null,
+            margin: 10,
+            color: '#505a63',
+            fontSize: 10
+          },
+        },
+        dataZoom: {
+          type: 'inside',
+          start: 0,
+          end: 100
+        },
+        series: [{
+          name: 'Chrome',
+          data: {{ chrome_score }},
+          type: 'line',
+          smooth: true
+        }, {
+          name: 'Firefox',
+          data: {{ firefox_score }},
+          type: 'line',
+          smooth: true
+        }, {
+          name: 'Edge',
+          data: {{ edge_score }},
+          type: 'line',
+          smooth: true
+        }]
+      };
+
+      myChart.setOption(option);
+      if (option && typeof option === "object") {
+        myChart.setOption(option, true);
+        var updateChartSize = function() {
+          myChart.resize();
+        }
+        window.addEventListener('resize', updateChartSize, false);
+      }
+    }
+    $(document).ready(function() {
+      chart();
+    });
+  </script>
+{% endif %}
+<script>
+    $(document).ready(function() {
+        $('#query input[type="radio"]').change(function () {
+            $('#query').submit();
+        });
+    });
+    $(document).ready(function() {
+    });
+</script>
+{% if scores %}
+<script src='{{ url_for('static', filename='js/vendor/echarts/theme.js') }}'></script>
+{% endif %}
+
+{% endblock %}
+
+

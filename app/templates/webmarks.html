@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}WebMark - WebMarks{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+{% endblock %}
+
+{% block page_content %}
+  <main class="full-height-l mt-5">
+    <div class='container'>
+      <div class='row mt-0'>
+        <div class="col-md-12 text-center revise">
+          {% for message in get_flashed_messages() %}
+          <div class="alert mt-0 mb-4">
+              <button type="button" class="close" data-dismiss="alert">&times;</button>
+              {{ message }}
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class='col-lg-3 wow fadeIn' data-wow-delay='0.2s'>
+
+          <div class='widget-wrapper'>
+            <h4 class='h4-responsive font-bold mb-4'>Tags</h4>
+            <div class='list-group'>
+              <a href='{{ url_for('main.webmarks') }}' class='list-group-item active'>All</a>
+              {% for tag in tags %}
+              <a href='{{ url_for('main.webmarktag', name=tag.name) }}' class='list-group-item'>{{ tag.name }}</a>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="list-group">
+            <button type='button' id='proposenewwebmark' class="btn btn-outline-secondary btn-md" data-toggle="modal" data-target="#modalContactForm"><i class="fa fa-plus-circle"></i> Propose New WebMark</button>
+            {% if current_user.is_authenticated %}
+            <form action="/subscribe/" method="post">
+                <button class='btn btn-outline-secondary btn-md mb-3' id="subscribe" type="submit" title="Subscribe WenMark comments and updates">{% if subscription.global_subscribe %}<i class="fa fa-ban"></i> Unsubscribe{% else %}<i class="fa fa-paper-plane"></i> Subscribe{% endif %}</button>
+            </form>
+            {% else %}
+            <a class='btn btn-outline-secondary btn-md mb-3' href="{{ url_for('auth.login') }}?next=%2Fwebmark" title="Login to subscribe WenMark comments and updates"><i class="fa fa-paper-plane"></i> Subscribe</a>
+            {% endif %}
+          </div>
+        </div>
+
+
+        <div class='col-lg-9' id='benchmark'>
+          <div class='row wow fadeIn' data-wow-delay='0.2s'>
+            <div class='col-lg-12'>
+              <h4 class='h4-responsive font-bold mb-4 float-left'>Webmark | {% if name %}{{ name }} {% else %} All {% endif %}</h4>
+
+              {% if request.full_path.find('tag') < 0 %}
+              <h6 class='h6-responsive font-bold mb-4 float-right'>Order by
+                <a href="{% if request.full_path.find('page') > -1 %} {% if request.full_path.find('rating') < 0 %} {{ request.full_path }}&rating=1&comment=0 {% else %} {{ request.full_path | replace("rating=0", "rating=1") | replace("comment=1", "comment=0") }} {% endif %}{%else%}{{ url_for('main.webmarks') }}?rating=1&comment=0{% endif %}">Stars</a> |
+                <a href="{% if request.full_path.find('page') > -1 %} {% if request.full_path.find('rating') < 0 %} {{ request.full_path }}&rating=0&comment=1 {% else %} {{ request.full_path | replace("rating=1", "rating=0") | replace("comment=0", "comment=1") }} {% endif %}{%else%}{{ url_for('main.webmarks') }}?rating=0&comment=1{% endif %} ">Comments</a>
+              </h6>
+              {% endif %}
+            </div>
+          </div>
+
+            <div class='row'>
+          {% for webmark in webmarks %}
+            <div class='col-lg-4'>
+              <div class='card mb-r mb-3 wow fadeIn' data-wow-delay='0.1s' id='{{webmark.id}}'>
+                <a href="{{ url_for('main.webmark', id=webmark.id) }}" title="{{webmark.name}}">
+                  <img class='img-fluid' src='/static/uploads/{{webmark.screenshot_path}}' alt='{{webmark.name}}'>
+                  </a>
+                <div class='card-body'>
+                  <h5 class='font-bold'>
+                      <strong><a href="{{ url_for('main.webmark', id=webmark.id) }}" title="{{webmark.name}}">{{webmark.name}}</a></strong>
+                    {% if webmark.click_count %}{% if webmark.click_count > 20 %}<span class='badge badge-danger float-right'>Hot</span>{% endif %}{% endif %}
+                   <div id="rating-id-{{loop.index0}}" class="mb-2 ratingstar">
+                      <i class="star star-under fa fa-star" title="1 star: Very Poor">
+                        <i class="star star-over fa fa-star"></i>
+                      </i>
+                      <i class="star star-under fa fa-star" title="2 stars: Poor">
+                        <i class="star star-over fa fa-star"></i>
+                      </i>
+                      <i class="star star-under fa fa-star" title="3 stars: Good">
+                        <i class="star star-over fa fa-star"></i>
+                      </i>
+                      <i class="star star-under fa fa-star" title="4 stars: Very Good">
+                        <i class="star star-over fa fa-star"></i>
+                      </i>
+                      <i class="star star-under fa fa-star" title="5 stars: Outstanding">
+                        <i class="star star-over fa fa-star"></i>
+                      </i>
+                    </div>
+                  </h5>
+                  <hr>
+                  <p class='card-text mt-2'>
+                    {{webmark.summary}}
+                  </p>
+                    <div class="float-right">
+                  {% if current_user.is_administrator() %}
+                        {% if webmark.ready %}
+                  <a href="{{ url_for('main.run_webmark', id=webmark.id) }}" class='btn btn-gradient btn-sm d-inline-block' title="Run {{webmark.name}} on your hardware">Run Test</a>
+                  <!--<button type='button' class='btn btn-outline-secondary btn-sm d-inline-block queue' title="Add {{webmark.name}} to test queue"><i class="fa fa-list-ul"></i></button>-->
+                  {% endif %}
+                        <!--<button type='button' class='btn btn-outline-secondary btn-sm d-inline-block queue' title="Subscribe comments and updates for {{webmark.name}}"><i class="fa fa-paper-plane"></i></button>-->
+                  <a href="{{ url_for('main.edit_webmark', id=webmark.id) }}" class='btn btn-outline-secondary btn-sm d-inline-block queue' title="Edit WebMark">Edit</a>
+                  {% elif current_user.is_authenticated %}
+                  <a href="{{ url_for('main.webmark', id=webmark.id) }}" class='btn btn-outline-secondary  btn-sm d-inline-block' title="View {{webmark.name}}">Read More</a>
+                  {% if webmark.ready %}
+                  <a href="{{ url_for('main.run_webmark', id=webmark.id) }}" class='btn btn-gradient btn-sm d-inline-block' title="Run {{webmark.name}} on your hardware">Run Test</a>
+                  <!--<button type='button' class='btn btn-outline-secondary btn-sm d-inline-block queue' title="Add {{webmark.name}} to test queue"><i class="fa fa-list-ul"></i></button>-->
+                  {% endif %}
+                        <!--<a class='btn btn-outline-secondary btn-sm d-inline-block' title="Subscribe comments and updates for {{webmark.name}}"><i class="fa fa-paper-plane"></i></a>-->
+                  {% else %}
+                  <a href="{{ url_for('main.webmark', id=webmark.id) }}" class='btn btn-outline-secondary btn-sm d-inline-block' title="View {{webmark.name}}">Read More</a>
+                  {% if webmark.ready %}
+                  <a class='btn btn-gradient btn-sm d-inline-block' href="{{ url_for('auth.login') }}?next=%2Fwebmark" title="Login to run test">Run Test</a>
+                  <!--<a class='btn btn-outline-secondary btn-sm d-inline-block queue' href="{{ url_for('auth.login') }}?next=%2Fwebmark" title="Login to add test queue"><i class="fa fa-list-ul"></i></a>-->
+                  {% endif %}
+                  <!--<a class='btn btn-outline-secondary btn-sm d-inline-block' href="{{ url_for('auth.login') }}?next=%2Fwebmark" title="Login to subscribe comments and updates for {{webmark.name}}"><i class="fa fa-paper-plane"></i></a>-->
+                  {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+           </div>
+
+          <div class='row mt-3'>
+            <nav class='row wow fadeIn' data-wow-delay='0.1s'>
+              {%if pagination%}
+                  <div class="pagination">
+                      {{ macros.pagination_widget(pagination, '.webmarks') }}
+                  </div>
+              {% endif %}
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+<div class="modal fade reviseform" id="modalContactForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog cascading-modal" role="document">
+      <div class="modal-content">
+        <div class="modal-body">
+          <button type="button" class="close waves-effect waves-light" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+          </button>
+          {{ wtf.quick_form(form) }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+  <script>
+    $('input[type=radio]').on('change', function() {
+        $(this).closest("form").submit();
+    });
+  </script>
+  <script>
+    const rating = [{% for r in webmarks %}{{r.rating_avg}},{% endfor %}]
+
+    for (let i in rating) {
+      rateStyleJQ(rating[i], 'rating-id-' + i)
+    }
+
+    function rateStyleJQ(num, divID) {
+      var ratingRounded = Math.floor(num);
+      $("#" + divID + " .star-over").slice(0, ratingRounded).addClass('star-visible');
+      var partialShade = Math.round((num - ratingRounded) * 100);
+      if (partialShade != 0) {
+        $($("#" + divID + " .star-over").get(ratingRounded)).addClass('star-visible').css("width", partialShade + "%");
+      }
+    }
+  </script>
+{% endblock %}
+

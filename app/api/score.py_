@@ -1,0 +1,57 @@
+from flask import jsonify, request, g, url_for, current_app
+from flask import make_response
+from .. import db
+from ..models import Score, Webmark, User, Permission
+from . import api
+from .decorators import permission_required
+from .errors import forbidden
+
+
+@api.route('/scores/')
+def get_scores():
+    page = request.args.get('page', 1, type=int)
+    pagination = Score.query.paginate(
+        page, per_page=current_app.config['WEBMARK_SCORES_PER_PAGE'],
+        error_out=False)
+    scores = pagination.items
+    prev = None
+    if pagination.has_prev:
+        prev = url_for('api.get_scores', page=page - 1)
+    next = None
+    if pagination.has_next:
+        next = url_for('api.get_scores', page=page + 1)
+    return jsonify({
+        'scores': [score.to_json() for score in scores],
+        'prev': prev,
+        'next': next,
+        'count': pagination.total
+    })
+
+
+@api.route('/scores/<int:id>')
+def get_score(id):
+    score = Score.query.get_or_404(id)
+    return jsonify(score.to_json())
+
+
+@api.route('/scores/', methods=['POST', 'OPTIONS'])
+@permission_required(Permission.WRITE)
+def new_score():
+    score = Score.from_json(request.json)
+    db.session.add(score)
+    db.session.commit()
+    return jsonify(score.to_json()), 201, \
+         {'Location': url_for('api.get_scores')}
+
+
+@api.route('/scores/<int:id>', methods=['PUT'])
+@permission_required(Permission.WRITE)
+def edit_score(id):
+    score = Score.query.get_or_404(id)
+    if g.current_user != score.author and \
+            not g.current_user.can(Permission.ADMIN):
+        return forbidden('Insufficient permissions')
+    score.body = request.json.get('body', score.body)
+    db.session.add(score)
+    db.session.commit()
+    return jsonify(score.to_json())
