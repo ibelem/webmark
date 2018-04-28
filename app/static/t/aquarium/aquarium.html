@@ -932,7 +932,8 @@ void main() {
           'author_id': urlParam('u'),
           'score_id': urlParam('sid'),
           'score': checkResult(),
-          'webmark_id': urlParam('w')
+          'webmark_id': urlParam('w'),
+          'cpu': urlParam('cpu') || '',
         })
       }
 
@@ -959,9 +960,13 @@ void main() {
       set6.click();
       const timeId = setInterval(() => {
         if (checkResult()) {
-          console.log(checkResult())
+          console.log(checkResult());
           sendScore();
-          clearInterval(timeId)
+          clearInterval(timeId);
+          setTimeout(function(){
+            var backurl = location.protocol + '//' + location.host + '/view-browser/';
+            location.href = backurl;
+          }, 3000);
         };
       }, 6000)
     }

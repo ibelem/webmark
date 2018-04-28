@@ -102,19 +102,20 @@
                   {% endif %}
                         <!--<button type='button' class='btn btn-outline-secondary btn-sm d-inline-block queue' title="Subscribe comments and updates for {{webmark.name}}"><i class="fa fa-paper-plane"></i></button>-->
                   <a href="{{ url_for('main.edit_webmark', id=webmark.id) }}" class='btn btn-outline-secondary btn-sm d-inline-block queue' title="Edit WebMark">Edit</a>
+                  <a href="{{ url_for('main.webmark', id=webmark.id) }}" class='btn btn-outline-secondary  btn-sm d-inline-block' title="View {{webmark.name}}">More</a>
                   {% elif current_user.is_authenticated %}
-                  <a href="{{ url_for('main.webmark', id=webmark.id) }}" class='btn btn-outline-secondary  btn-sm d-inline-block' title="View {{webmark.name}}">Read More</a>
                   {% if webmark.ready %}
                   <a href="{{ url_for('main.run_webmark', id=webmark.id) }}" class='btn btn-gradient btn-sm d-inline-block' title="Run {{webmark.name}} on your hardware">Run Test</a>
                   <!--<button type='button' class='btn btn-outline-secondary btn-sm d-inline-block queue' title="Add {{webmark.name}} to test queue"><i class="fa fa-list-ul"></i></button>-->
                   {% endif %}
+                  <a href="{{ url_for('main.webmark', id=webmark.id) }}" class='btn btn-outline-secondary  btn-sm d-inline-block' title="View {{webmark.name}}">Read More</a>
                         <!--<a class='btn btn-outline-secondary btn-sm d-inline-block' title="Subscribe comments and updates for {{webmark.name}}"><i class="fa fa-paper-plane"></i></a>-->
                   {% else %}
-                  <a href="{{ url_for('main.webmark', id=webmark.id) }}" class='btn btn-outline-secondary btn-sm d-inline-block' title="View {{webmark.name}}">Read More</a>
                   {% if webmark.ready %}
                   <a class='btn btn-gradient btn-sm d-inline-block' href="{{ url_for('auth.login') }}?next=%2Fwebmark" title="Login to run test">Run Test</a>
                   <!--<a class='btn btn-outline-secondary btn-sm d-inline-block queue' href="{{ url_for('auth.login') }}?next=%2Fwebmark" title="Login to add test queue"><i class="fa fa-list-ul"></i></a>-->
                   {% endif %}
+                  <a href="{{ url_for('main.webmark', id=webmark.id) }}" class='btn btn-outline-secondary btn-sm d-inline-block' title="View {{webmark.name}}">Read More</a>
                   <!--<a class='btn btn-outline-secondary btn-sm d-inline-block' href="{{ url_for('auth.login') }}?next=%2Fwebmark" title="Login to subscribe comments and updates for {{webmark.name}}"><i class="fa fa-paper-plane"></i></a>-->
                   {% endif %}
                   </div>

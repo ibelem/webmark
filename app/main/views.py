@@ -430,7 +430,7 @@ def view_trend():
 def view_browser():
     webmarks = Webmark.query.with_entities(Webmark.id, Webmark.name, Webmark.ready, Webmark.score_measurement_unit).filter_by(ready=True)
     os = db.session.query(Scores.os, Scores.os_version).distinct().all()
-    browsers = db.session.query(Scores.browser_name).distinct().all()
+    browsers = db.session.query(Scores.browser_name).order_by(Scores.browser_name).distinct().all()
     update = Scores.query.with_entities(Scores.timestamp).order_by(Scores.timestamp.desc()).first()
 
     querylist = {}

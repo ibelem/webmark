@@ -167,7 +167,7 @@
           type: 'category',
           data: [
            {% for s, w in scores %}
-              '{% if uid|int() == s.author_id|int() %}MY{% else %}{% endif %} {% if s.cpu_name == '' %}CPU Unknown{% else %}{{ s.cpu_name | replace("AMD","") }}{% endif %}/{{ s.gpu_name | replace("vs_5_0 ps_5_0", "") |replace("(NVIDIA GeForce","") | replace("(Intel(R) ","") | replace(")","") | replace("Intel(R", "") | replace("(Skylake GT2","") | replace("ANGLE","") | replace("Direct3D11","") | replace("Microsoft","") | replace("Google","") |replace("Mesa DRI","") | replace("Graphics","") | replace(" ","")}}\n{{ s.screen_width }}x{{ s.screen_height }} {{ s.browser_name }} {{ s.browser_version }}',
+              '{% if uid|int() == s.author_id|int() %}MY{% else %}{% endif %} {% if s.cpu_name == '' %}CPU Unknown{% else %}{{ s.cpu_name | replace("AMD","") }}{% endif %}/{{ s.gpu_name | replace("vs_5_0 ps_5_0", "") |replace("(NVIDIA GeForce","") | replace("(Intel(R) ","") | replace(")","") | replace("Intel(R", "") | replace("(Skylake GT2","") | replace("ANGLE","") | replace("Direct3D11","") | replace("Microsoft","") | replace("Google","") |replace("Mesa DRI","") | replace("Graphics","") | replace("(TM","") | replace(" ","")}}\n{{ s.screen_width }}x{{ s.screen_height }} {{ s.browser_name }} {{ s.browser_version }}',
            {% endfor %}
           ],
           boundaryGap: true,
@@ -209,10 +209,7 @@
         let updateChartSize = function() {
           myChart.resize();
         }
-        document.addEventListener('resize', updateChartSize, false);
-        $('.card').resize(function() {
-          updateChartSize();
-        });
+        window.addEventListener('resize', updateChartSize, false);
       }
     }
 

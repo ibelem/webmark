@@ -377,7 +377,8 @@
           'author_id': urlParam('u'),
           'score_id': urlParam('sid'),
           'score': checkResult(),
-          'webmark_id': urlParam('w')
+          'webmark_id': urlParam('w'),
+          'cpu': urlParam('cpu') || '',
         })
       }
       fetch(location.protocol + '//' + location.host + '/api/v1/scoresfinal/', obj).then(function(res) {
@@ -416,9 +417,13 @@
         if (checkResult()) {
           console.log(checkResult())
           sendScore();
-          clearInterval(timeId)
+          clearInterval(timeId);
+          setTimeout(function(){
+            var backurl = location.protocol + '//' + location.host + '/view-browser/';
+            location.href = backurl;
+          }, 3000);
         };
-      }, 10000)
+      }, 6000)
     }
 
     window.addEventListener('load', runtest, false);

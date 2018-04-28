@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}WebMark - Run Webmarks{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+{% endblock %}
+
+{% block page_content %}
+  <main class="full-height-l mt-5">
+    <div class='container'>
+      <div class='row mt-0'>
+        <div class="col-md-12 text-center revise">
+            <h3 class="h3-responsive mt-1 font-bold">Before Testing {{ webmark.name }} </h3>
+            <hr>
+            <h5 class="h5-responsive mt-4 font-bold text-left">1. Allow pop-ups (if testing is blocked)</h5>
+            <div class="text-left" id="popupcontent">
+                <div class="privacyul">
+                    <div class='row'>
+                        <ul class="col col-md-12">
+                            <li id="browser"></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="text-left font-italic f-note pl-3 pb-1">
+                New tabs will be popped up when running benchmarks, please add the website to the pop-ups allow list.
+                </div>
+            </div>
+
+            <!--<div class="mt-3 text-left" id="popup">-->
+                <!--<input class="styled-checkbox" id="popupck" type="checkbox" value="">-->
+                <!--<label for="popupck"> I allowed the pop-ups or added this site to pop-ups allow list</label>-->
+            <!--</div>-->
+            <h5 class="h5-responsive mt-4 font-bold text-left">2. Review Data Policy</h5>
+            <div class="text-left" id="cpuconfirm">
+                <label class="control-label" for="cpu" title="Your CPU Model">CPU (e.g. <span class="cpubadge badgecpu"><a href="https://ark.intel.com/#@Processors" title="Intel® Core™ i5-8600K Processor">i5-8600K</a></span> or <span class="cpubadge badgecpu"><a href="https://www.amd.com/en/products/cpu/amd-ryzen-7-1800x" title="AMD Ryzen™ 7 1800X Processor">Ryzen 7 1800X</a></span>):</label>
+                <input type="text" class="cpu" name="cpu" id="cpu" value="">
+                <!--<div class="float-right">-->
+                <!--<input class="styled-checkbox" id="cpuunknown" type="checkbox" value="" class="float-right">-->
+                <!--<label for="cpuunknown" id="cpuunknowlb" class=""> I don't know my CPU model</label>-->
+                <!--</div>-->
+            </div>
+
+
+
+            <div class="mt-3 text-left" id="privacy">
+                <input class="styled-checkbox" id="privacyck" type="checkbox" value="">
+                <label for="privacyck"> I have read the <a href="{{ url_for('main.privacy') }}" title="Privacy Statement">privacy statement</a> and agree to upload my WebMark results to server</label>
+            </div>
+
+            <h3 class="h3-responsive mt-4 font-bold">Start Testing {{ webmark.name }}</h3>
+
+            <table id="filter" class="t-filter table table-condensed mt-3">
+            <tbody>
+              <tr>
+                <th>WebMark</th>
+                  <th>Test Path</th>
+                <th>Test Config</th>
+                  <th>Unit of Measurement</th>
+                <th>Test Duration</th>
+                <!--<th>Confirmation</th>-->
+              </tr>
+              <tr>
+                  <td><a href="{{ url_for('main.webmark', id=webmark.id) }}">{{ webmark.name }}</a></td>
+                  <td>{{ webmark.test_path }}</td>
+                  <td>{{ webmark.config }}</td>
+                  <td>{{ webmark.score_measurement_unit }}</td>
+                  <td>Up to {{ webmark.duration }} Seconds</td>
+                  <!--<td>-->
+                       <!--<input class="styled-checkbox" id="styled-checkbox-1" type="checkbox" value="value1" checked>-->
+                       <!--<label for="styled-checkbox-1"></label>-->
+                  <!--</td>-->
+              </tr>
+            </tbody>
+          </table>
+            <div class="text-left font-italic f-note">
+            After clicking the "Start Test" button, you will automatically get the data when the test duration is completed.
+            </div>
+          <button type="submit" class="btn btn-gradient mt-3 mb-3" id="test">Start Test</button>
+    </div>
+    </div>
+    </div>
+</main>
+<!--<div id="fp"></div>-->
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/vendor/hardware/ua-parser.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/vendor/hardware/webmark-environment.js') }}"></script>
+<script>
+  var sit = function() {
+      var webmarkenvironment = new WebMarkEnvironment();
+      var result = webmarkenvironment.result();
+
+      var devicevendor = result.hardware.devicevendor ? result.hardware.devicevendor : 'None'
+      var devicemodel = result.hardware.devicemodel ? result.hardware.devicemodel : 'None'
+      var devicetype = result.hardware.devicetype ? result.hardware.devicetype : 'None'
+      var devicememory = result.hardware.devicememory ? result.hardware.devicememory : 'None'
+
+      var obj = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Authorization': 'Basic ' + btoa('{{token}}' + ':')
+        },
+        body: JSON.stringify({
+          'score': '',
+          'author_id': {{uid}},
+          'webmark_id': {{ webmarkid }},
+          'cpu_name': $('#cpu').val(),
+          'gpu_name': result.hardware.gpu,
+          'cpu_architecture': result.hardware.cpuarchitecture,
+          'cpu_hardware_concurrency': result.hardware.cpuhardwareconcurrency,
+          'gpu_vender': result.hardware.gpuvender,
+          'browser_name': result.browser.name,
+          'browser_version': result.browser.version,
+          'browser_major': result.browser.major,
+          'browser_language': result.browser.language,
+          'browser_engine_name': result.browser.enginename,
+          'browser_engine_version': result.browser.engineversion,
+          'browser_ua': result.browser.useragent,
+          'browser_channel': '',
+          'software_os': result.software.os,
+          'software_os_version': result.software.osversion,
+          'software_platform': result.software.platform,
+          'software_timezone': result.software.timezone,
+          'hardware_device_vendor': devicevendor,
+          'hardware_device_model': devicemodel,
+          'hardware_device_type': devicetype,
+          'hardware_device_memory': devicememory,
+          'hardware_screen_width': result.hardware.screenwidth,
+          'hardware_screen_height': result.hardware.screenheight,
+        })
+      }
+
+      fetch(location.protocol + '//'+ location.host +'/api/v1/scores/', obj).then(function (res) {
+              var json = res.json();
+              json.then(function (value) {
+                  var webmarkenvironment = new WebMarkEnvironment();
+                  var result = webmarkenvironment.result();
+                  url = location.protocol + '//'+ location.host + '{{ webmark.test_path }}?u='+ {{uid}} +'&sid='+ value.score_id +'&w='+ {{ webmarkid }} + '&t={{token}}'
+                  var win = window.open(url, "_blank")
+                  backurl = location.protocol + '//'+ location.host + '/view-browser/?o='+ result.software.os + ' ' + result.software.osversion + '&b='+ result.browser.name + '&wm={{ webmark.name }}'
+                  // console.log(backurl)
+                  setTimeout(function () { win.close(); location.href= backurl; }, {{ webmark.duration | int() * 1000 }});
+              }, function (error) {
+                  console.log(error);
+              });
+          }).catch(function (e) {
+              console.log(e);
+      });
+  }
+
+    $(document).ready(function() {
+
+      var webmarkenvironment = new WebMarkEnvironment();
+      var result = webmarkenvironment.result();
+      var browsername = result.browser.name;
+      var browsertip = '';
+
+      switch(result.browser.name) {
+        case 'Chrome':
+            browsertip = '<i class="fa fa-chrome"></i> chrome://settings/content/popups';
+            break;
+        case 'Opera':
+            browsertip = '<i class="fa fa-opera"></i> opera://settings/content/popups';
+            break;
+        case 'Vivaldi':
+            browsertip = '<i class="fa fa-chrome"></i> vivaldi://settings/appearance';
+            break;
+        case 'Firefox':
+            browsertip = '<i class="fa fa-firefox"></i> about:preferences#privacy -> permissions -> Block pop-up windows -> Exceptions';
+            break;
+        case 'Safari':
+            browsertip = '<i class="fa fa-safari"></i> Preferences -> Security Preferences -> Block pop-up windows';
+            break;
+        case 'Edge':
+            browsertip = '<i class="fa fa-edge"></i> Settings -> Advanced Settings -> Block pop-ups -> Off';
+            break;
+        default:
+            browsertip = 'Disable the pop-ups blocker in your browser settings';
+      }
+      $('#browser').html(browsertip);
+
+      <!--$('#cpuunknown').click(function(){-->
+            <!--$('#cpu').attr('disabled', this.checked);-->
+            <!--$('#cpu').val('');-->
+            <!--$('.cpubadge').toggleClass('badgecpu', !this.checked);-->
+      <!--});-->
+
+      $('#test').prop('disabled', true);
+
+      $('#privacyck').click(function(){
+        $('#privacycontent').toggle();
+        if ($('#privacyck').prop('checked')) {
+          $('#test').prop('disabled', false)
+        } else {
+          $('#test').prop('disabled', true)
+        }
+      });
+
+      $('#popupck').click(function(){
+        $('#popupcontent').toggle();
+      });
+
+      $('#test').click(function(){
+        console.log($('#cpu').val())
+        sit();
+      });
+    });
+</script>
+
+{% endblock %}

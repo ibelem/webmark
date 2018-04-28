@@ -64,8 +64,9 @@ def new_score():
                                         webmark_id=request.json['webmark_id']).first()
 
     if scorecheck:
-        return jsonify({'score_id':scorecheck.id}), 201, \
-             {'Location': url_for('api.get_scores')}
+        print(scorecheck)
+        return jsonify({'score_id': scorecheck.id}), 201, \
+               {'Location': url_for('api.get_scores')}
     else:
         score = Scores.from_json(request.json)
         db.session.add(score)
@@ -95,8 +96,9 @@ def new_score():
                                             timezone=request.json['software_timezone'],
                                             author_id=request.json['author_id'],
                                             webmark_id=request.json['webmark_id']).first()
-        return jsonify({'score_id':scorecheck.id}), 201, \
-             {'Location': url_for('api.get_scores')}
+        print(scorecheck)
+        return jsonify({'score_id': scorecheck.id}), 201, \
+               {'Location': url_for('api.get_scores')}
 
 
 @api.route('/scoresfinal/', methods=['POST', 'OPTIONS'])
@@ -106,9 +108,10 @@ def scores_final():
         result = request.get_json()
         score_id = result['score_id']
         score = result['score']
+        cpu = result['cpu']
         if score and score_id:
             db.session.query(Scores).filter(Scores.id == int(score_id)).update(
-                            {Scores.score: score})
+                            {Scores.score: score, Scores.cpu_name: cpu})
             db.session.commit()
         return jsonify({'score_id': score_id, 'score': score}), 201, \
                {'Location': url_for('api.get_scores')}
