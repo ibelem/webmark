@@ -217,7 +217,11 @@
       chart_{% for s, w in scores %}{% if loop.first %}{{ w.id }}{% endif %}{% endfor %}();
     }
 
+    {% endif %}
+
     $(document).ready(function() {
+
+    {% if scores %}
       var h = 130 + {{scores | length }}*56;
       $('.webmarkrank').height('' + h + 'px');
 
@@ -228,6 +232,8 @@
         <!--$('.expand-switcher').toggleClass('fa-angle-double-left');-->
         <!--$('.webmarkrank').toggleClass('webmarkrank-toggle');-->
       <!--});-->
+
+      {% endif %}
 
       $('input:radio[name=cwm]').click(function(){
         var rid = $("input:radio[name='cwm']:checked").attr('id');
@@ -242,7 +248,7 @@
         location.href= '../run-webmark/' + rid;
       });
     });
-    {% endif %}
+ 
 
 </script>
 {% if scores %}

@@ -29,7 +29,8 @@
                   <td>{{ webmark.test_path }}</td>
                   <td>{{ webmark.config }}</td>
                   <td>{{ webmark.score_measurement_unit }}</td>
-                  <td>Up to {{ webmark.duration }} Seconds</td>
+                  {% set number = webmark.duration | int %}
+                  <td class="{% if number > 300%}n-r{% elif number > 30%}n-y{% else %}n-g{% endif %}">Up to {{ number }} seconds<br>Up to {% if number > 60%}{{ number//60 }}{% elif number <= 60 and number > 30 %}1{% else %}0.5{% endif %} minutes</td>
               </tr>
             </tbody>
           </table>
@@ -42,7 +43,7 @@
                 <label for="privacyck"> I have read the <a href="{{ url_for('main.privacy') }}" title="Privacy Statement">privacy statement</a> and agree to upload my WebMark results to server</label>
             </div>
             <div class="text-left font-italic f-note">
-            Please wait for the test duration is completed after clicking the "Start Test" button
+            Please wait for the <span class="{% if number > 300%}n-r{% elif number > 30%}n-y{% else %}n-g{% endif %}">test duration is completed</span> after clicking the "Start Test" button
             </div>
           <button type="submit" class="btn btn-gradient mt-3 mb-3" id="test">Start Test</button>
     </div>
