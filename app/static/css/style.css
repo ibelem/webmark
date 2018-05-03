@@ -16,7 +16,7 @@ body {
 }
 
 #maintitle {
-  padding-top: 15rem;
+  padding-top: 12rem;
 }
 
 .intro {
@@ -26,6 +26,7 @@ body {
 
 #home {
   background: none;
+  z-index: 10;
 }
 
 .top-nav-collapse {
@@ -41,7 +42,7 @@ body {
 .hm:not(.top-nav-collapse) {
   background: -webkit-linear-gradient(50deg, rgba(32, 150, 255, .4), rgba(5, 255, 163, .4))!important;
   background: linear-gradient(40deg, rgba(32, 150, 255, .4), rgba(5, 255, 163, .4))!important;
-  z-index: 10;
+  z-index: 100;
 }
 
 .hm .dropdown-item {
@@ -755,13 +756,39 @@ table.table tr:hover {
 }
 
 footer {
+  z-index: 10;
   background: -webkit-linear-gradient(50deg, rgba(32, 150, 255, 1.0), rgba(5, 255, 163, 1.0))!important;
   background: linear-gradient(40deg, rgba(32, 150, 255, 1.0), rgba(5, 255, 163, 1.0))!important;
 }
 
+footer ul li {
+    text-align: right;
+}
+
+#home footer {
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  background: -webkit-linear-gradient(50deg, rgba(32, 150, 255, 0.1), rgba(5, 255, 163, 0.1))!important;
+  background: linear-gradient(40deg, rgba(32, 150, 255, 0.1), rgba(5, 255, 163, 0.1))!important;
+}
+
+#home footer a {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+#home footer a:hover {
+    color: rgba(255, 255, 255, 1.0);
+}
+
+
+footer .col-md-6 p {
+    margin-top: -12px;
+}
+
 .custom-gradient .full-bg-img {
-  background: -webkit-linear-gradient(50deg, rgba(32, 150, 255, 0.3), rgba(5, 255, 163, 0.3))!important;
-  background: linear-gradient(40deg, rgba(32, 150, 255, 0.3), rgba(5, 255, 163, 0.3))!important;
+
 }
 
 .card {
@@ -1224,7 +1251,7 @@ main {
 
 @media (max-width: 768px) {
   #maintitle {
-    padding-top: 10rem;
+    padding-top: 6rem;
   }
   #mainwebgl,
   .loader {
@@ -1241,6 +1268,8 @@ main {
   .card {
     margin-bottom: 3rem;
   }
+  #fps { font-size: 4rem; }
+  #fpsscope { margin-top: 0rem; }
 }
 
 @media (max-width: 740px) {
@@ -1254,9 +1283,7 @@ main {
     height: 100vh;
   }
   .btn {
-    display: block !important;
     margin: 0.2rem auto !important;
-    width: 50vw;
     text-align: center;
   }
   #proposenewwebmark {

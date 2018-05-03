@@ -90,40 +90,7 @@
         </div>
     </div>
 </nav>
-{% endblock %} {% block content %} {% block page_content %} {% endblock %} {% block footer %}
-<footer class="page-footer font-small pt-3">
-    <div class="container-fluid text-center text-md-left">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>WebMark</h5>
-                    <p>Complete Performance Testing Suite for Web</p>
-                </div>
-                <div class="col-md-6">
-                    <!--<h5>Links</h5>-->
-                    <ul class="list-unstyled float-right ml-5">
-                        <li><a href='{{ url_for('main.feedback') }}?refer={{request.path}}'
-                            title='Feedback'>Feedback</a>
-                        </li>
-                        <li><a href='{{ url_for('main.about') }}' title='About Us'>About</a></li>
-                    </ul>
-                    <ul class="list-unstyled float-right">
-                        <li><a href='{{ url_for('main.privacy') }}' title='Privacy'>Privacy</a></li>
-                        <li><a href='{{ url_for('main.tou') }}' title='Terms of Use'>Terms of Use</a></li>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="footer-copyright py-3 text-center">
-        <div class="container-fluid">
-            &copy;2018 <a href="{{ url_for('main.index') }}">WebMark</a>
-            <!--{{ request.path }}-->
-        </div>
-    </div>
-</footer>
-{% endblock footer %} {% endblock %} {% block scripts %} {{ super() }}
+{% endblock %} {% block content %} {% block page_content %} {% endblock %}  {% endblock %} {% block scripts %} {{ super() }}
 <script src="{{ url_for('static', filename='js/moment-with-locales.min.js') }}"></script>
 <script>
 

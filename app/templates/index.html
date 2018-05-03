@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "baselite.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 {% import "_macros.html" as macros %}
 
@@ -32,8 +32,36 @@
             </div>
           </div>
         </div>
+        <footer class="page-footer font-small pt-3">
+        <div class="container-fluid text-center text-md-left">
+            <div class="container">
+                <div class="row">
+                    <!--<div class="col-md-6">-->
+                        <!--<h5>WebMark</h5>-->
+                        <!--&lt;!&ndash;<p>Complete Performance Testing Suite for Web</p>&ndash;&gt;-->
+                    <!--</div>-->
+                    <div class="col-md-12 text-center pb-3">
+                        <a class="ml-2 mr-2" href='{{ url_for('main.privacy') }}' title='Privacy'>Privacy</a>
+                        <a class="ml-2 mr-2" href='{{ url_for('main.tou') }}' title='Terms of Use'>Terms of Use</a>
+                        <a class="ml-2 mr-2" href='{{ url_for('main.feedback') }}?refer={{request.path}}'
+                                title='Feedback'>Feedback</a>
+                        <a class="ml-2 mr-2" href='{{ url_for('main.about') }}' title='About Us'>About</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-copyright py-3 text-center">
+            <div class="container-fluid">
+                &copy;2018 <a href="{{ url_for('main.index') }}">WebMark</a>
+                <!--{{ request.path }}-->
+            </div>
+        </div>
+        </footer>
       </div>
     </section>
+
+
+
  <canvas></canvas>
 {% endblock %}
 

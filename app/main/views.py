@@ -447,6 +447,8 @@ def view_browser():
                 filter(Scores.os_version == o.split(" ")[1]). \
                 filter(Scores.browser_name == b). \
                 filter(Scores.webmark_id == we.id). \
+                filter(Scores.score.isnot(None)). \
+                filter(Scores.score != ''). \
                 order_by(cast(Scores.score, Integer)).all()
             return render_template('browser.html', webmarks=webmarks, os=os, browsers=browsers, update=update,
                                    scores=scores, querylist=querylist, uid=current_user.get_id())
@@ -458,6 +460,8 @@ def view_browser():
                 filter(Scores.os_version == os[0].os_version). \
                 filter(Scores.browser_name == browsers[0].browser_name). \
                 filter(Webmark.name == webmarks[0].name). \
+                filter(Scores.score.isnot(None)). \
+                filter(Scores.score != ''). \
                 order_by(cast(Scores.score, Integer)).all()
             return render_template('browser.html', webmarks=webmarks, os=os, browsers=browsers, update=update,
                                    scores=scores,
@@ -476,6 +480,8 @@ def view_browser():
                 filter(Scores.os_version == o.split(" ")[1]). \
                 filter(Scores.browser_name == b). \
                 filter(Scores.webmark_id == we.id). \
+                filter(Scores.score.isnot(None)). \
+                filter(Scores.score != ''). \
                 order_by(cast(Scores.score, Integer)).all()
         elif o and b:
             scores = db.session.query(Scores, Webmark). \
@@ -483,6 +489,8 @@ def view_browser():
                 filter(Scores.os == o.split(" ")[0]). \
                 filter(Scores.os_version == o.split(" ")[1]). \
                 filter(Scores.browser_name == b). \
+                filter(Scores.score.isnot(None)). \
+                filter(Scores.score != ''). \
                 order_by(cast(Scores.score, Integer)).all()
         elif o and wm:
             scores = db.session.query(Scores, Webmark). \
@@ -490,28 +498,38 @@ def view_browser():
                 filter(Scores.os == o.split(" ")[0]). \
                 filter(Scores.os_version == o.split(" ")[1]). \
                 filter(Scores.webmark_id == we.id). \
+                filter(Scores.score.isnot(None)). \
+                filter(Scores.score != ''). \
                 order_by(cast(Scores.score, Integer)).all()
         elif b and wm:
             scores = db.session.query(Scores, Webmark). \
                 filter(Scores.webmark_id == Webmark.id). \
                 filter(Scores.browser_name == b). \
                 filter(Scores.webmark_id == we.id). \
+                filter(Scores.score.isnot(None)). \
+                filter(Scores.score != ''). \
                 order_by(cast(Scores.score, Integer)).all()
         elif o:
             scores = db.session.query(Scores, Webmark). \
                 filter(Scores.webmark_id == Webmark.id). \
                 filter(Scores.os == o.split(" ")[0]). \
                 filter(Scores.os_version == o.split(" ")[1]). \
+                filter(Scores.score.isnot(None)). \
+                filter(Scores.score != ''). \
                 order_by(cast(Scores.score, Integer)).all()
         elif b:
             scores = db.session.query(Scores, Webmark). \
                 filter(Scores.webmark_id == Webmark.id). \
                 filter(Scores.browser_name == b). \
+                filter(Scores.score.isnot(None)). \
+                filter(Scores.score != ''). \
                 order_by(cast(Scores.score, Integer)).all()
         elif wm:
             scores = db.session.query(Scores, Webmark). \
                 filter(Scores.webmark_id == Webmark.id). \
                 filter(Scores.webmark_id == we.id). \
+                filter(Scores.score.isnot(None)). \
+                filter(Scores.score != ''). \
                 order_by(cast(Scores.score, Integer)).all()
         return render_template('browser.html', webmarks=webmarks, os=os, browsers=browsers, update=update,
                                scores=scores, querylist=querylist, uid=current_user.get_id())
@@ -933,6 +951,30 @@ def add_webmark():
         if form.errors:
             flash(form.errors)
     return render_template('admin/add_webmark.html', form=form)
+
+
+@main.route('/edit-my-browser-results/', methods=['POST'])
+@login_required
+def edit_my_browser_results():
+    if request.method == 'POST':
+        dict = request.form.to_dict()
+        for i in dict:
+            id = str(i).replace('s', '').replace('d', '')
+            if i.find('d') > -1:
+                db.session.query(Scores).filter(Scores.id == int(id)).delete()
+                db.session.commit()
+            if i.find('s') > -1:
+                db.session.query(Scores).filter(Scores.id == int(id)).update(
+                    {Scores.cpu_name: dict[i]})
+                db.session.commit()
+    return redirect(url_for('main.review_my_browser_results'))
+
+
+@main.route('/review-my-browser-results/', methods=['GET'])
+@login_required
+def review_my_browser_results():
+    results = db.session.query(Webmark, Scores).filter(Scores.webmark_id == Webmark.id).filter(Scores.author_id == current_user.get_id()).order_by(Scores.webmark_id).all()
+    return render_template('review_my_browser_results.html', results=results)
 
 
 @main.route('/edit-webmark-test/', methods=['POST'])
