@@ -16,7 +16,7 @@ Flask-Moment==0.5.1
 Flask-PageDown==0.2.2
 Flask-SQLAlchemy==2.3.2
 Flask-WTF==0.14.2
-flask_cors==3.0.3
+flask_cors==3.0.9
 # Flask-Uploads==0.2.1
 html5lib==0.999999999
 itsdangerous==0.24
